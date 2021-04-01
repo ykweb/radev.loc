@@ -1,6 +1,8 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\Objects;
+use common\models\ObjectsSearch;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -74,7 +76,23 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $searchModel = new ObjectsSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+
+    }
+
+    public function actionObjectDetail() {
+        if (isset($_POST['expandRowKey'])) {
+            $model = Objects::findOne($_POST['expandRowKey']);
+            return $this->renderPartial('/objects/view', ['model'=>$model]);
+        } else {
+            return '<div class="alert alert-danger">No data found</div>';
+        }
     }
 
     /**
