@@ -68,6 +68,8 @@ class ObjectController extends Controller
         $model = new Objects();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $model->_imageFile = UploadedFile::getInstance($model, '_imageFile');
+            $model->uploadImage();
             return $this->redirect(['index']);
         }
 
@@ -88,11 +90,8 @@ class ObjectController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-
             $model->_imageFile = UploadedFile::getInstance($model, '_imageFile');
-            if ($model->uploadImage()===false) {
-
-            }
+            $model->uploadImage();
             return $this->redirect(['update', 'id' => $model->id]);
         }
 
