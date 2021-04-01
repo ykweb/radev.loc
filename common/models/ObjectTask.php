@@ -2,7 +2,8 @@
 
 namespace common\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "object_task".
@@ -14,7 +15,7 @@ use Yii;
  * @property Object $object
  * @property Task $task
  */
-class ObjectTask extends \yii\db\ActiveRecord
+class ObjectTask extends ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -32,8 +33,8 @@ class ObjectTask extends \yii\db\ActiveRecord
         return [
             [['object_id', 'task_id'], 'required'],
             [['object_id', 'task_id'], 'integer'],
-            [['object_id'], 'exist', 'skipOnError' => true, 'targetClass' => Object::className(), 'targetAttribute' => ['object_id' => 'id']],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
+            [['object_id'], 'exist', 'skipOnError' => true, 'targetClass' => Object::class, 'targetAttribute' => ['object_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
         ];
     }
 
@@ -52,20 +53,20 @@ class ObjectTask extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Object]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getObject()
     {
-        return $this->hasOne(Object::className(), ['id' => 'object_id']);
+        return $this->hasOne(Object::class, ['id' => 'object_id']);
     }
 
     /**
      * Gets query for [[Task]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getTask()
     {
-        return $this->hasOne(Task::className(), ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 }

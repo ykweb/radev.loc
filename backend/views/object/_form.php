@@ -19,7 +19,7 @@ use common\models\Task;
             <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($model, 'object_id')->widget(Select2::classname(), [
+            <?= $form->field($model, 'object_id')->widget(Select2::class, [
                 'data' => $model->listOtherObjects,
                 'options' => ['placeholder' => 'Select parent object'],
                 'pluginOptions' => [

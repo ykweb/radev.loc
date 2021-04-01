@@ -2,7 +2,11 @@
 
 namespace common\models;
 
+use voskobovich\behaviors\ManyToManyBehavior;
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "object".
@@ -17,16 +21,19 @@ use Yii;
  * @property Objects $parentObject
  * @property Objects[] $subObjects
  * @property ObjectTask[] $objectTasks
+ * @property Task[] $tasks
  *
  * @property ObjectTask[] $listOtherObject
  */
-class Objects extends \yii\db\ActiveRecord
+class Objects extends ActiveRecord
 {
     /**
      * @var UploadedFile
      */
     public $_imageFile;
+    // Directory for storing uploaded images. Use aliases
     private $directory_image='@frontend/web/uploads/';
+    //The relative address of the folder location on the web server
     private $url_image='/uploads/';
 
     /**
@@ -47,7 +54,7 @@ class Objects extends \yii\db\ActiveRecord
             [['object_id'], 'integer'],
             [['title'], 'string', 'max' => 128],
             [['image'], 'string', 'max' => 120],
-            [['object_id'], 'exist', 'skipOnError' => true, 'targetClass' => Objects::className(), 'targetAttribute' => ['object_id' => 'id']],
+            [['object_id'], 'exist', 'skipOnError' => true, 'targetClass' => Objects::class, 'targetAttribute' => ['object_id' => 'id']],
             ['task_ids', 'each', 'rule' => ['integer']],
             [['_imageFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg', 'maxFiles' => 1],
         ];
@@ -62,6 +69,7 @@ class Objects extends \yii\db\ActiveRecord
             'id' => 'ID',
             'object_id' => 'Parent object',
             'title' => 'Title',
+            'parentObjectTitle' => 'Parent title',
         ];
     }
 
@@ -69,7 +77,7 @@ class Objects extends \yii\db\ActiveRecord
     {
         return [
             [
-                'class' => \voskobovich\behaviors\ManyToManyBehavior::class,
+                'class' => ManyToManyBehavior::class,
                 'relations' => [
                     'task_ids' => 'tasks',
                 ],
@@ -177,11 +185,11 @@ class Objects extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Object]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getParentObject()
     {
-        return $this->hasOne(Objects::className(), ['id' => 'object_id']);
+        return $this->hasOne(Objects::class, ['id' => 'object_id']);
     }
 
     /**
@@ -200,20 +208,21 @@ class Objects extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Objects]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getSubObjects()
     {
-        return $this->hasMany(Objects::className(), ['object_id' => 'id']);
+        return $this->hasMany(Objects::class, ['object_id' => 'id']);
     }
 
     /**
      * Gets query for [[ObjectTasks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
+     * @throws InvalidConfigException
      */
     public function getTasks()
     {
-        return $this->hasMany(Task::className(), ['id' => 'task_id'])->viaTable('object_task', ['object_id' => 'id']);
+        return $this->hasMany(Task::class, ['id' => 'task_id'])->viaTable('object_task', ['object_id' => 'id']);
     }
 }

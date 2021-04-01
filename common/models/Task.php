@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "task".
@@ -13,7 +15,7 @@ use Yii;
  * @property ObjectTask[] $objectTasks
  * @property TaskList[] $taskLists
  */
-class Task extends \yii\db\ActiveRecord
+class Task extends ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -92,20 +94,20 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[ObjectTasks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getObjectTasks()
     {
-        return $this->hasMany(ObjectTask::className(), ['task_id' => 'id']);
+        return $this->hasMany(ObjectTask::class, ['task_id' => 'id']);
     }
 
     /**
      * Gets query for [[TaskLists]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getTaskLists()
     {
-        return $this->hasMany(TaskList::className(), ['task_id' => 'id']);
+        return $this->hasMany(TaskList::class, ['task_id' => 'id']);
     }
 }
