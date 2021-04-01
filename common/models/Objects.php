@@ -10,6 +10,8 @@ use Yii;
  * @property int $id
  * @property int $object_id Parent object
  * @property string $title
+ * @property string $image
+ * @property string $img  image position or message
  * @property array $task_ids
  *
  * @property Objects $parentObject
@@ -20,6 +22,13 @@ use Yii;
  */
 class Objects extends \yii\db\ActiveRecord
 {
+    /**
+     * @var UploadedFile
+     */
+    public $_imageFile;
+    private $directory_image='@frontend/web/uploads/';
+    private $url_image='/uploads/';
+
     /**
      * {@inheritdoc}
      */
@@ -37,8 +46,10 @@ class Objects extends \yii\db\ActiveRecord
             [['title'], 'required'],
             [['object_id'], 'integer'],
             [['title'], 'string', 'max' => 128],
+            [['image'], 'string', 'max' => 120],
             [['object_id'], 'exist', 'skipOnError' => true, 'targetClass' => Objects::className(), 'targetAttribute' => ['object_id' => 'id']],
-            ['task_ids', 'each', 'rule' => ['integer']]
+            ['task_ids', 'each', 'rule' => ['integer']],
+            [['_imageFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg', 'maxFiles' => 1],
         ];
     }
 
@@ -107,6 +118,46 @@ class Objects extends \yii\db\ActiveRecord
         Yii::debug('Object delete');
         if (method_exists(Yii::$app,'getSession')){
             Yii::$app->getSession()->setFlash('Object_delete_'.mt_rand(), ['message' => 'Object deleted','type'=>'info']);
+        }
+    }
+
+    /**
+     * Return image URL or false
+     * @return bool|string
+     */
+    public function getImg(){
+        if (!$this->image){
+            return false;
+        }
+        return $this->url_image.$this->image;
+    }
+
+    /**
+     * Upload image to directory image
+     * Name file = project->id
+     * @return bool
+     */
+    public function uploadImage()
+    {
+        if (!$this->_imageFile){
+            return false;
+        }
+        if ($this->validate()) {
+            $this->_imageFile->saveAs(Yii::getAlias($this->directory_image.$this->id . '.' . $this->_imageFile->extension));
+            $this->image=$this->id. '.' . $this->_imageFile->extension;
+            $this->save(false);
+
+            Yii::debug('Image save');
+            if (method_exists(Yii::$app,'getSession')){
+                Yii::$app->getSession()->setFlash('image_save_'.mt_rand(), ['message' => 'Image save','type'=>'success']);
+            }
+            return true;
+        } else {
+            Yii::debug('Error load image');
+            if (method_exists(Yii::$app,'getSession')){
+                Yii::$app->getSession()->setFlash('image_save_'.mt_rand(), ['message' => 'Error load image','type'=>'danger']);
+            }
+            return false;
         }
     }
 

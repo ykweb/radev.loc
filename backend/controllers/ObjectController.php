@@ -8,6 +8,7 @@ use common\models\ObjectsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * ObjectController implements the CRUD actions for Objects model.
@@ -87,6 +88,11 @@ class ObjectController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            $model->_imageFile = UploadedFile::getInstance($model, '_imageFile');
+            if ($model->uploadImage()===false) {
+
+            }
             return $this->redirect(['update', 'id' => $model->id]);
         }
 

@@ -14,17 +14,35 @@ use common\models\Task;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+    <div class="row">
+        <div class="col-md-12">
+            <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'object_id')->widget(Select2::classname(), [
+                'data' => $model->listOtherObjects,
+                'options' => ['placeholder' => 'Select parent object'],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'task_ids')->dropDownList(Task::getDropdownListAll(), ['multiple' => true]) ?>
+        </div>
+        <div class="col-md-12">
+            <?= $model->img? Html::img($model->img,['style'=>'max-width:500px']) : 'No picture' ?>
+            <?= $form->field($model, '_imageFile')->fileInput() ?>
+        </div>
 
-    <?= $form->field($model, 'object_id')->widget(Select2::classname(), [
-        'data' => $model->listOtherObjects,
-        'options' => ['placeholder' => 'Select parent object'],
-        'pluginOptions' => [
-            'allowClear' => true
-        ],
-    ]) ?>
+    </div>
 
-    <?= $form->field($model, 'task_ids')->dropDownList(Task::getDropdownListAll(), ['multiple' => true]) ?>
+
+
+
+
+
+
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
